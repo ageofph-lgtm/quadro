@@ -1,0 +1,19 @@
+{
+  "name": "Quadro — leitor de HQ",
+  "short_name": "Quadro",
+  "description": "Leitor de HQs em PDF com virada de página realista.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#111014",
+  "theme_color": "#111014",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "file_handlers": [
+    { "action": "./", "accept": { "application/pdf": [".pdf"] }, "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }], "launch_type": "single-client" }
+  ]
+}
