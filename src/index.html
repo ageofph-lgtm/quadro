@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Quadro — leitor de HQ</title>
 <meta name="theme-color" content="#111014">
 <link rel="manifest" href="manifest.webmanifest">
@@ -15,12 +15,12 @@
     font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);overflow:clip;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);overflow:hidden;overflow:clip;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
   button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
   .hidden{display:none!important}
 
   /* ---------- Biblioteca ---------- */
-  #library{position:absolute;inset:0;overflow-y:auto;padding:28px clamp(18px,4vw,56px) 80px}
+  #library{position:absolute;inset:0;overflow-y:auto;padding:max(28px,env(safe-area-inset-top)) clamp(18px,4vw,56px) 80px}
   .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:28px}
   .brand{display:flex;align-items:center;gap:12px;margin-right:auto}
   .brand .logo{width:44px;height:44px;border-radius:12px;background:var(--acc);display:grid;place-items:center;transform:rotate(-4deg);box-shadow:4px 4px 0 var(--acc2)}
@@ -53,8 +53,8 @@
   body.drag #library{outline:3px dashed var(--acc);outline-offset:-12px}
 
   /* ---------- Leitor ---------- */
-  #reader{position:absolute;inset:0;overflow:clip;background:radial-gradient(ellipse at center,#1d1b22 0%,#0b0a0d 75%)}
-  #stage{position:absolute;inset:0;overflow:clip;touch-action:none;display:flex;align-items:center;justify-content:center;padding:10px}
+  #reader{position:absolute;inset:0;overflow:hidden;overflow:clip;background:radial-gradient(ellipse at center,#1d1b22 0%,#0b0a0d 75%)}
+  #stage{position:absolute;inset:0;overflow:hidden;overflow:clip;touch-action:none;display:flex;align-items:center;justify-content:center;padding:10px}
   #book{width:100%;height:100%}
   .page{background:#18161c;overflow:hidden}
   .page img{width:100%;height:100%;object-fit:fill;display:block;opacity:0;transition:opacity .25s;pointer-events:none;-webkit-user-drag:none}
@@ -66,8 +66,8 @@
   @keyframes sp{to{transform:rotate(360deg)}}
 
   .hud{position:absolute;left:0;right:0;display:flex;align-items:center;gap:10px;padding:14px 18px;transition:opacity .25s,transform .25s;z-index:50}
-  .hud.topbar{top:0;background:linear-gradient(#000c,#0000)}
-  .hud.bottombar{bottom:0;background:linear-gradient(#0000,#000c);padding-bottom:20px}
+  .hud.topbar{top:0;background:linear-gradient(#000c,#0000);padding-top:max(14px,env(safe-area-inset-top))}
+  .hud.bottombar{bottom:0;background:linear-gradient(#0000,#000c);padding-bottom:max(20px,env(safe-area-inset-bottom))}
   #reader.chrome-off .hud.topbar{opacity:0;transform:translateY(-12px);pointer-events:none}
   #reader.chrome-off .hud.bottombar{opacity:0;transform:translateY(12px);pointer-events:none}
   .ib{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(30,28,34,.75);border:1px solid #ffffff1a;flex:none}
