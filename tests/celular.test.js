@@ -4,7 +4,13 @@ const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch();
   const ctx = await b.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
-  await ctx.addInitScript(() => { delete Map.prototype.getOrInsert; delete Map.prototype.getOrInsertComputed; delete Math.sumPrecise; delete Promise.try; });
+  await ctx.addInitScript(() => { for (const [o, k] of [[Map.prototype, 'getOrInsert'], [Map.prototype, 'getOrInsertComputed'], [Math, 'sumPrecise'], [Promise, 'try'], [Uint8Array.prototype, 'toHex'], [Uint8Array.prototype, 'toBase64'], [Uint8Array, 'fromBase64'], [Promise, 'withResolvers']]) { try { delete o[k]; } catch {} } });
+  // remove as mesmas APIs também DENTRO dos workers (pdf.js e IA), como num celular de verdade
+  const KILL = 'for (const [o,k] of [[Map.prototype,"getOrInsert"],[Map.prototype,"getOrInsertComputed"],[WeakMap.prototype,"getOrInsert"],[WeakMap.prototype,"getOrInsertComputed"],[Math,"sumPrecise"],[Promise,"try"],[Uint8Array.prototype,"toHex"],[Uint8Array.prototype,"toBase64"],[Uint8Array,"fromBase64"],[Uint8Array,"fromHex"],[Promise,"withResolvers"]]) { try { delete o[k]; } catch {} }\n';
+  await ctx.route(/(lib\/polyfills\.js|detector\.js)/, async (route) => {
+    const res = await route.fetch();
+    await route.fulfill({ response: res, body: KILL + (await res.text()), headers: { ...res.headers(), 'content-type': 'text/javascript' } });
+  });
   const p = await ctx.newPage();
   const errs = [];
   p.on('pageerror', e => errs.push('PAGEERR: ' + e.message));

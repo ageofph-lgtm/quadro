@@ -1,4 +1,5 @@
 // Worker de detecção de balões/textos (comic-text-detector, YOLOv5, int8)
+import './polyfills.js';
 import * as ort from 'onnxruntime-web/wasm';
 
 const S = 1024;
