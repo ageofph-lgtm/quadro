@@ -1,6 +1,6 @@
 {
   "name": "quadro",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Quadro — leitor de HQ em PDF (PWA) com virada de página realista e zoom em balão por IA",
   "type": "commonjs",
@@ -8,7 +8,7 @@
     "build": "sh build.sh",
     "serve": "python3 -m http.server 8765 -d dist",
     "sample": "python3 tools/mksample.py tests/amostra.pdf",
-    "test": "node tests/leitor.test.js && node tests/baloes.test.js"
+    "test": "node tests/leitor.test.js && node tests/baloes.test.js && node tests/celular.test.js"
   },
   "dependencies": {
     "onnxruntime-web": "^1.31.1",

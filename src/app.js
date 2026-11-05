@@ -1,5 +1,5 @@
 // Quadro — leitor de HQ em PDF (v1)
-import * as pdfjs from 'pdfjs-dist/build/pdf.mjs';
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs'; // build com polyfills: funciona em Safari/Chrome de celular
 import { PageFlip } from 'page-flip/dist/js/page-flip.module.js';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('lib/pdf.worker.min.js', document.baseURI).href;
@@ -11,6 +11,9 @@ const PDF_OPTS = {
 
 const $ = (s) => document.querySelector(s);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// iPhone/iPad recusam canvas acima de ~16,7 megapixels; fica uma margem de segurança
+const MAX_CANVAS_PX = /iP(hone|ad|od)|Macintosh.*Mobile/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform)) ? 12e6 : 24e6;
+function fitArea(w, h) { const k = Math.min(1, Math.sqrt(MAX_CANVAS_PX / (w * h))); return k; }
 const inIframe = (() => { try { return window.self !== window.top; } catch { return true; } })();
 
 /* ======================= Armazenamento (IndexedDB) ======================= */
@@ -293,10 +296,14 @@ function wantLandscape() {
   const st = $('#stage');
   return !R.forceSingle && st.clientWidth / st.clientHeight > R.ratio * 1.45;
 }
+// A biblioteca usa 1 página quando largura < 2×minWidth. Ajustamos minWidth pela largura real do palco.
+function orientationMinWidth() {
+  return wantLandscape() ? 1 : Math.ceil($('#stage').clientWidth / 2) + 2;
+}
 function applyOrientationSetting() {
   if (!R.pf) return;
-  const s = R.pf.getSettings();
-  s.minWidth = wantLandscape() ? 1 : 100000;
+  R.pf.getSettings().minWidth = orientationMinWidth();
+  const bk = $('#book'); if (bk) { bk.style.minWidth = '0px'; bk.style.minHeight = '0px'; }
 }
 
 function buildBook() {
@@ -318,7 +325,7 @@ function buildBook() {
   const start = Math.min(R.comic.page || 0, R.entries.length - 1);
   const pf = new PageFlip(book, {
     width: baseW, height: baseH, size: 'stretch',
-    minWidth: wantLandscape() ? 1 : 100000, maxWidth: 4000, minHeight: 1, maxHeight: 6000,
+    minWidth: orientationMinWidth(), maxWidth: 4000, minHeight: 1, maxHeight: 6000,
     showCover: true, usePortrait: true, drawShadow: true, maxShadowOpacity: 0.55,
     flippingTime: 650, mobileScrollSupport: false, swipeDistance: 40,
     showPageCorners: true, startPage: start, autoSize: true,
@@ -330,6 +337,8 @@ function buildBook() {
     return origStop(pos, isSwipe);
   };
   pf.loadFromHTML(els);
+  book.style.minWidth = '0px'; book.style.minHeight = '0px'; // a biblioteca aplica minWidth como estilo
+  pf.update();
   pf.on('flip', (e) => onPage(e.data));
   pf.on('changeOrientation', () => scheduleRender());
   R.pf = pf;
@@ -392,7 +401,8 @@ async function renderEntry(i, H) {
   const e = R.entries[i];
   const page = await R.doc.getPage(e.p);
   const vp0 = page.getViewport({ scale: 1 });
-  const scale = H / vp0.height;
+  let scale = H / vp0.height;
+  scale *= fitArea((e.half ? vp0.width / 2 : vp0.width) * scale, vp0.height * scale);
   const vp = page.getViewport({ scale });
   const cv = document.createElement('canvas');
   cv.width = Math.ceil(e.half ? vp.width / 2 : vp.width);
@@ -895,9 +905,11 @@ async function crispBubble(it, b, pxW) {
     const vp0 = page.getViewport({ scale: 1 });
     const entryW = e.half ? vp0.width / 2 : vp0.width;
     const offX = e.half === 'R' ? vp0.width / 2 : 0;
-    const w = Math.min(2600, Math.max(64, Math.round(pxW)));
-    const scale = w / ((b[2] - b[0]) * entryW);
-    const h = Math.round((b[3] - b[1]) * vp0.height * scale);
+    let w = Math.min(2600, Math.max(64, Math.round(pxW)));
+    let scale = w / ((b[2] - b[0]) * entryW);
+    let h = Math.round((b[3] - b[1]) * vp0.height * scale);
+    const k = fitArea(w, h);
+    if (k < 1) { w = Math.round(w * k); h = Math.round(h * k); scale *= k; }
     const vp = page.getViewport({ scale });
     const cv = document.createElement('canvas');
     cv.width = w; cv.height = h;

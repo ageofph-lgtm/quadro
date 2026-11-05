@@ -1,6 +1,6 @@
 # Quadro — leitor de HQ
 
-Leitor de HQs em PDF feito para tablet, pensado para o Surface em modo tablet. É uma PWA: roda no navegador e pode ser instalada como app pelo Edge.
+Leitor de HQs em PDF feito para tablet, pensado para o Surface em modo tablet. Também funciona no celular (Android e iPhone). É uma PWA: roda no navegador e pode ser instalada como app pelo Edge.
 
 ## O que faz
 
@@ -61,7 +61,7 @@ O deploy é automático. Cada push no `main` publica no GitHub Pages pelo workfl
 
 ## Créditos e licenças
 
-- [pdf.js](https://github.com/mozilla/pdf.js) (Apache-2.0)
+- [pdf.js](https://github.com/mozilla/pdf.js) (Apache-2.0). Usa o build *legacy*, que traz polyfills para Safari e Chrome de celular.
 - [StPageFlip](https://github.com/Nodlik/StPageFlip) (MIT)
 - [ONNX Runtime Web](https://github.com/microsoft/onnxruntime) (MIT)
 - **Modelo de balões:** [comic-text-detector](https://github.com/dmMaze/comic-text-detector), pesos de [manga-image-translator](https://github.com/zyddnys/manga-image-translator), licença **GPL-3.0**. Aqui ele foi recortado só na saída de caixas e quantizado para int8. Uso pessoal sem restrição. Distribuir o app junto com o modelo implica seguir a GPL-3.0.
