@@ -9,8 +9,15 @@ cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm dist/lib/ort/
 cp models/ctd-int8.onnx dist/models/
 cp src/index.html src/manifest.webmanifest src/sw.js dist/
 cp node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs dist/lib/pdf.worker.min.js
+# worker do pdf.js: polyfills primeiro, depois o pdf.js (módulos avaliam na ordem dos imports)
+npx esbuild src/polyfills.js --minify --target=es2020,safari15,chrome100 --outfile=dist/lib/polyfills.js --log-level=warning
+printf "import './polyfills.js?v=__BUILD__';\nimport './pdf.worker.min.js?v=__BUILD__';\n" > dist/lib/pdf.worker.entry.js
 cp -r node_modules/pdfjs-dist/wasm dist/lib/wasm
 # (wasm/standard_fonts são os mesmos no build legacy)
 cp -r node_modules/pdfjs-dist/standard_fonts dist/lib/standard_fonts
 cp icons/*.png dist/icons/
+# versão do build nos links: o navegador é obrigado a baixar a versão nova (sem cache velho)
+BUILD=$(date -u +%Y%m%d%H%M%S)
+sed -i "s/__BUILD__/$BUILD/g" dist/index.html dist/sw.js dist/app.js dist/lib/pdf.worker.entry.js
+echo "build $BUILD"
 du -sh dist; ls -la dist

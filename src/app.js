@@ -1,8 +1,9 @@
-// Quadro — leitor de HQ em PDF (v1)
+// Quadro — leitor de HQ em PDF
+import './polyfills.js'; // precisa vir antes do pdf.js
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs'; // build com polyfills: funciona em Safari/Chrome de celular
 import { PageFlip } from 'page-flip/dist/js/page-flip.module.js';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('lib/pdf.worker.min.js', document.baseURI).href;
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('lib/pdf.worker.entry.js?v=__BUILD__', document.baseURI).href;
 const PDF_OPTS = {
   wasmUrl: new URL('lib/wasm/', document.baseURI).href,
   standardFontDataUrl: new URL('lib/standard_fonts/', document.baseURI).href,
@@ -603,7 +604,7 @@ const Det = {
   worker: null, seq: 0, pending: new Map(),
   get() {
     if (!this.worker) {
-      this.worker = new Worker(new URL('detector.js', document.baseURI), { type: 'module' });
+      this.worker = new Worker(new URL('detector.js?v=__BUILD__', document.baseURI), { type: 'module' });
       this.worker.onmessage = (e) => {
         const p = this.pending.get(e.data.id);
         if (!p) return;
@@ -1125,7 +1126,7 @@ if ('launchQueue' in window) {
 }
 
 if ('serviceWorker' in navigator && !inIframe && location.protocol === 'https:') {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=__BUILD__').catch(() => {});
 }
 
 refreshLibrary().then(() => { queueCovers(); restoreFolder(); });
